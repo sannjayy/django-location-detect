@@ -6,18 +6,17 @@ geolocator = Nominatim(user_agent="http")
 
 @csrf_exempt
 def set_location(request):
-    if request.method == 'POST':
-        if 'latitude' and 'longitude' in request.POST:
-            latitude = request.POST['latitude']
-            longitude = request.POST['longitude']
+    if request.method == 'POST' and 'longitude' in request.POST:
+        latitude = request.POST['latitude']
+        longitude = request.POST['longitude']
 
-            # Fetch Address 
-            location = geolocator.reverse(latitude+","+longitude)
-            address = location.raw['address']           
-             
-            response = HttpResponse('success')
-            response.set_cookie('address', address)
-            return response
+        # Fetch Address 
+        location = geolocator.reverse(latitude+","+longitude)
+        address = location.raw['address']           
+
+        response = HttpResponse('success')
+        response.set_cookie('address', address)
+        return response
     
     return HttpResponse('This page is not accessale.')
 
