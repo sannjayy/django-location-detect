@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>User Location Detect</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script> const URL = "{% url 'set_location' %}";</script>
+	</head>
+	<body>		
+		<h6 class="text-center mt-3">Device Location with JavaScript by Sanjay!</h6>
+
+		<div class="border d-flex align-items-center justify-content-center" style="height: 100px;">
+
+			<button onclick="getLocation();return false;" class="btn btn-secondary">
+				<span class="btn-label"><i class="fa fa-map-marker"></i></span> Use current location</button>
+		</div>
+		<h6 class="text-center mt-5" id="screen">Click the button to get your current coordinates.</h6>
+		
+		{% if address %}
+			<div class="alert alert-success text-center mt-3" role="alert">
+				<h6>Current Location</h6>
+				{{address}}
+			</div>
+		{% endif %}
+		
+		<html>
+		<script>
+
+		// Requesting on Views
+		const updateCoordiantes = async (latitude, longitude) => {
+			var data = {'latitude': latitude, 'longitude':longitude};
+			await $.post(URL, data, function(response){
+				if(response === 'success')
+				{ 
+					console.log('Coordiante request has been sent.')
+				} else { 
+					console.log('Request time error.') 
+				}
+			});
+		}
+
+		// Reference : https://dev.to/codebubb/how-to-get-a-user-s-location-with-javascript-362o
+		
+		const getError = error => {
+			switch(error.code) {
+		    case error.PERMISSION_DENIED:
+		      console.log("User denied the request for Geolocation.")
+		      break;
+		    case error.POSITION_UNAVAILABLE:
+		      console.log("Location information is unavailable.")
+		      break;
+		    case error.TIMEOUT:
+		      console.log("The request to get user location timed out.")
+		      break;
+		    case error.UNKNOWN_ERROR:
+		      console.log("An unknown error occurred.")
+		      break;
+		  }
+		}
+
+		const getResponse = async res => {
+			const latitude = res.coords.latitude
+			const longitude = res.coords.longitude
+			console.log('Latitude : ', latitude)
+			console.log('Longitude : ', longitude)
+			document.getElementById("screen").innerHTML = `Latitude : ${latitude} <br> Longitude : ${longitude}`;
+
+			// Calling Ajax Function
+			await updateCoordiantes(latitude, longitude);
+			location.reload()
+
+		}
+
+		const getLocation = () => {
+			if (window.navigator.geolocation) {
+				// Geolocation available
+				// window.navigator.geolocation.getCurrentPosition(console.log, console.log);
+				window.navigator.geolocation.getCurrentPosition(getResponse, getError);
+			} else { 
+			    console.log("Geolocation is not supported by this browser.")
+			}
+		}
+		</script>
+	</body>
+</html>
